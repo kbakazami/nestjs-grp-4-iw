@@ -18,7 +18,7 @@ export interface GetRequest {
 }
 
 export interface GetResponse {
-  heroes: Product[];
+  products: Product[];
 }
 
 export interface AddRequest {
