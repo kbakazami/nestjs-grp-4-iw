@@ -22,7 +22,7 @@ message GetRequest {
 }
 
 message GetResponse {
-  repeated Product heroes = 1;
+  repeated Product products = 1;
 }
 
 message AddRequest {
