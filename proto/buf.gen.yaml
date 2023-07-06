@@ -10,3 +10,8 @@ plugins:
     opt:
       - addGrpcMetadata=true
       - nestJs=true
+  - plugin: buf.build/community/stephenh-ts-proto
+    out: ../user/src/stubs
+    opt:
+      - addGrpcMetadata=true
+      - nestJs=true

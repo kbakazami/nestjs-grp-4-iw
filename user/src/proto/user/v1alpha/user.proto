@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package user.v1alpha;
+
+message User {
+  int32 id = 1;
+  string firstname = 2;
+  string lastname = 3;
+  string email = 4;
+}
+
+service UserCRUDService {
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Add(AddRequest) returns (AddResponse);
+  rpc Update(UpdateRequest) returns (UpdateResponse);
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
+
+message GetRequest {
+  int32 id = 1;
+  string firstname = 2;
+  string lastname = 3;
+  string email = 4;
+}
+
+message GetResponse {
+  repeated User users = 1;
+}
+
+message AddRequest {
+  string firstname = 2;
+  string lastname = 3;
+  string email = 4;
+  string password = 5;
+}
+
+message AddResponse {
+  User user = 1;
+}
+
+message UpdateRequest {
+  int32 id = 1;
+  string firstname = 2;
+  string lastname = 3;
+  string email = 4;
+}
+
+message UpdateResponse {
+  User user = 1;
+}
+
+message DeleteRequest {
+  int32 id = 1;
+}
+
+message DeleteResponse {
+  User user = 1;
+}
