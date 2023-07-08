@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from './stubs/user/v1alpha/user';
 import { PrismaService } from './prisma.service';
 import { Prisma } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AppService {
@@ -33,8 +34,8 @@ export class AppService {
     });
   }
 
-  findByEmail(email: string): Promise<User[]> {
-    return this.prisma.user.findMany({
+  findByEmail(email: string): Promise<User> {
+    return this.prisma.user.findUnique({
       where: { email },
     });
   }
@@ -50,5 +51,31 @@ export class AppService {
     return this.prisma.user.delete({
       where: { id },
     });
+  }
+
+  async checkPassword(
+    email: string,
+    password: string,
+  ): Promise<{ user: User; match: boolean }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        firstname: true,
+        lastname: true,
+        email: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      return { user: null, match: false };
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+
+    return { user, match };
   }
 }
