@@ -32,6 +32,7 @@ export interface AddRequest {
 
 export interface AddResponse {
   user: User | undefined;
+  message: string;
 }
 
 export interface UpdateRequest {
@@ -53,6 +54,24 @@ export interface DeleteResponse {
   user: User | undefined;
 }
 
+export interface CheckPasswordRequest {
+  email: string;
+  password: string;
+}
+
+export interface CheckPasswordResponse {
+  status: CheckPasswordResponse_STATUS;
+  user: User | undefined;
+}
+
+export enum CheckPasswordResponse_STATUS {
+  OK = 0,
+  WRONG_PASSWORD = 1,
+  NOT_FOUND = 2,
+  INTERNAL = 3,
+  UNRECOGNIZED = -1,
+}
+
 export const USER_V1ALPHA_PACKAGE_NAME = "user.v1alpha";
 
 export interface UserCRUDServiceClient {
@@ -63,6 +82,8 @@ export interface UserCRUDServiceClient {
   update(request: UpdateRequest, metadata?: Metadata): Observable<UpdateResponse>;
 
   delete(request: DeleteRequest, metadata?: Metadata): Observable<DeleteResponse>;
+
+  checkPassword(request: CheckPasswordRequest, metadata?: Metadata): Observable<CheckPasswordResponse>;
 }
 
 export interface UserCRUDServiceController {
@@ -79,11 +100,16 @@ export interface UserCRUDServiceController {
     request: DeleteRequest,
     metadata?: Metadata,
   ): Promise<DeleteResponse> | Observable<DeleteResponse> | DeleteResponse;
+
+  checkPassword(
+    request: CheckPasswordRequest,
+    metadata?: Metadata,
+  ): Promise<CheckPasswordResponse> | Observable<CheckPasswordResponse> | CheckPasswordResponse;
 }
 
 export function UserCRUDServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["get", "add", "update", "delete"];
+    const grpcMethods: string[] = ["get", "add", "update", "delete", "checkPassword"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UserCRUDService", method)(constructor.prototype[method], method, descriptor);

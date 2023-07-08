@@ -14,6 +14,7 @@ service UserCRUDService {
   rpc Add(AddRequest) returns (AddResponse);
   rpc Update(UpdateRequest) returns (UpdateResponse);
   rpc Delete(DeleteRequest) returns (DeleteResponse);
+  rpc CheckPassword(CheckPasswordRequest) returns (CheckPasswordResponse);
 }
 
 message GetRequest {
@@ -36,6 +37,7 @@ message AddRequest {
 
 message AddResponse {
   User user = 1;
+  string message = 2;
 }
 
 message UpdateRequest {
@@ -55,4 +57,21 @@ message DeleteRequest {
 
 message DeleteResponse {
   User user = 1;
+}
+
+message CheckPasswordRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message CheckPasswordResponse {
+  enum STATUS {
+    OK = 0;
+    WRONG_PASSWORD = 1;
+    NOT_FOUND = 2;
+    INTERNAL = 3;
+  }
+
+  STATUS status = 1;
+  User user = 2;
 }

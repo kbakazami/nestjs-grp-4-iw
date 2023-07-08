@@ -1,15 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
 import {
-  User,
-  GetRequest,
-  GetResponse,
   AddRequest,
   AddResponse,
-  UpdateRequest,
-  UpdateResponse,
+  CheckPasswordRequest,
+  CheckPasswordResponse,
+  CheckPasswordResponse_STATUS,
   DeleteRequest,
   DeleteResponse,
+  GetRequest,
+  GetResponse,
+  UpdateRequest,
+  UpdateResponse,
+  User,
   USER_CR_UD_SERVICE_NAME,
   UserCRUDServiceController,
   UserCRUDServiceControllerMethods,
@@ -38,8 +41,8 @@ export class AppController implements UserCRUDServiceController {
       users = await this.appService.findByLastName(request.lastname);
       return { users };
     } else if (request.email) {
-      users = await this.appService.findByEmail(request.email);
-      return { users };
+      user = await this.appService.findByEmail(request.email);
+      return { users: [user] };
     } else {
       users = await this.appService.findAll();
       return { users };
@@ -74,12 +77,60 @@ export class AppController implements UserCRUDServiceController {
 
   @GrpcMethod(USER_CR_UD_SERVICE_NAME)
   async add(request: AddRequest, metadata?: Metadata): Promise<AddResponse> {
-    const saltRounds = 10;
+    try {
+      const userExist = await this.appService.findByEmail(request.email);
 
-    request.password = await bcrypt.hash(request.password, saltRounds);
+      if (userExist) {
+        return {
+          user: undefined,
+          message: 'An account with this email already exist',
+        };
+      }
 
-    const user = await this.appService.create(request as any);
+      const saltRounds = 10;
 
-    return { user };
+      request.password = await bcrypt.hash(request.password, saltRounds);
+
+      const user = await this.appService.create(request as any);
+
+      return {
+        user,
+        message: 'Account created successfully !',
+      };
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async checkPassword(
+    request: CheckPasswordRequest,
+  ): Promise<CheckPasswordResponse> {
+    try {
+      const { user, match } = await this.appService.checkPassword(
+        request.email,
+        request.password,
+      );
+
+      if (!user) {
+        return {
+          status: CheckPasswordResponse_STATUS.NOT_FOUND,
+          user: undefined,
+        };
+      }
+
+      if (match) {
+        return {
+          user: user as any,
+          status: CheckPasswordResponse_STATUS.OK,
+        };
+      }
+
+      return {
+        status: CheckPasswordResponse_STATUS.WRONG_PASSWORD,
+        user: undefined,
+      };
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
