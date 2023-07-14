@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import {
   AddRequest,
@@ -22,11 +22,14 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { Metadata } from '@grpc/grpc-js';
 import * as bcrypt from 'bcrypt';
 
+import { AuthGuard } from './auth/auth.guard';
+
 @Controller()
 @UserCRUDServiceControllerMethods()
 export class AppController implements UserCRUDServiceController {
   constructor(private readonly appService: AppService) {}
 
+  @UseGuards(AuthGuard)
   async get(request: GetRequest, metadata?: Metadata): Promise<GetResponse> {
     let user: User;
     let users: User[] = [];
@@ -49,6 +52,7 @@ export class AppController implements UserCRUDServiceController {
     }
   }
 
+  @UseGuards(AuthGuard)
   async update(
     request: UpdateRequest,
     metadata?: Metadata,
@@ -66,6 +70,7 @@ export class AppController implements UserCRUDServiceController {
     return { user };
   }
 
+  @UseGuards(AuthGuard)
   async delete(
     request: DeleteRequest,
     metadata?: Metadata,
@@ -75,6 +80,7 @@ export class AppController implements UserCRUDServiceController {
     return { user };
   }
 
+  //No use of the AuthGard or users can't create an account
   @GrpcMethod(USER_CR_UD_SERVICE_NAME)
   async add(request: AddRequest, metadata?: Metadata): Promise<AddResponse> {
     try {
