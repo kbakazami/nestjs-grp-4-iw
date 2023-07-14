@@ -33,6 +33,7 @@ export interface ValidateResponse {
   ok: boolean;
   userId: number;
   userEmail: string;
+  internal: boolean;
 }
 
 export interface RefreshTokenRequest {
