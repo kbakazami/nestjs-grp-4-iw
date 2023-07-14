@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package auth.v1alpha;
+
+import "user/v1alpha/user.proto";
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Validate(ValidateRequest) returns (ValidateResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  enum STATUS {
+    OK = 0;
+    WRONG_PASSWORD = 1;
+    NOT_FOUND = 2;
+    INTERNAL = 3;
+  }
+
+  STATUS status = 1;
+  user.v1alpha.User user = 2;
+  string jwt = 3;
+}
+
+message ValidateRequest {
+  string jwt = 1;
+}
+
+message ValidateResponse {
+  bool ok = 1;
+  int32 userId = 2;
+  string userEmail = 3;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string refresh_token = 1;
+  string jwt = 2;
+  int32 user_id = 3;
+}

@@ -3,39 +3,39 @@ import {
   GrpcOptions,
   Transport,
 } from '@nestjs/microservices';
-import { USER_V1ALPHA_PACKAGE_NAME } from './stubs/user/v1alpha/user';
 import { addReflectionToGrpcConfig } from 'nestjs-grpc-reflection';
 import { join } from 'path';
-import { ConfigService } from '@nestjs/config';
 import { AUTH_V1ALPHA_PACKAGE_NAME } from './stubs/auth/v1alpha/auth';
+import { ConfigService } from '@nestjs/config';
+import { USER_V1ALPHA_PACKAGE_NAME } from './stubs/user/v1alpha/user';
 import { ChannelCredentials } from '@grpc/grpc-js';
 
 export default (configService: ConfigService): GrpcOptions => {
   return addReflectionToGrpcConfig({
     transport: Transport.GRPC,
     options: {
-      url: '0.0.0.0:3000',
-      package: USER_V1ALPHA_PACKAGE_NAME,
+      url: '0.0.0.0:3001',
+      package: AUTH_V1ALPHA_PACKAGE_NAME,
       loader: {
         includeDirs: [join(__dirname, 'proto')],
       },
-      protoPath: [join(__dirname, 'proto/user/v1alpha/user.proto')],
+      protoPath: [join(__dirname, 'proto/auth/v1alpha/auth.proto')],
     },
   });
 };
 
-export const authGrpcOptions = (
+export const userGrpcConfig = (
   configService: ConfigService,
 ): ClientProviderOptions => ({
-  name: AUTH_V1ALPHA_PACKAGE_NAME,
+  name: USER_V1ALPHA_PACKAGE_NAME,
   transport: Transport.GRPC,
   options: {
-    url: configService.get('AUTH_API_URL'),
-    package: AUTH_V1ALPHA_PACKAGE_NAME,
+    url: configService.get('USER_API_URL'),
+    package: USER_V1ALPHA_PACKAGE_NAME,
     loader: {
       includeDirs: [join(__dirname, 'proto')],
     },
-    protoPath: [join(__dirname, 'proto/auth/v1alpha/auth.proto')],
+    protoPath: [join(__dirname, 'proto/user/v1alpha/user.proto')],
     credentials: ChannelCredentials.createInsecure(),
   },
 });
