@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from './stubs/product/v1alpha/product';
-import { PrismaService } from "./prisma.service";
+import { PrismaService } from './prisma.service';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -33,5 +33,4 @@ export class AppService {
       where: { id },
     });
   }
-
 }

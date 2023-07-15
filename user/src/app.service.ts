@@ -3,6 +3,7 @@ import { User } from './stubs/user/v1alpha/user';
 import { PrismaService } from './prisma.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AppService {
@@ -17,9 +18,13 @@ export class AppService {
   }
 
   findById(id: number): Promise<User> {
-    return this.prisma.user.findUnique({
-      where: { id },
-    });
+    try {
+      return this.prisma.user.findUnique({
+        where: { id },
+      });
+    } catch (error) {
+      throw new RpcException(`User not found with id ${id} - ERROR : ${error}`);
+    }
   }
 
   findByFirstName(firstname: string): Promise<User[]> {

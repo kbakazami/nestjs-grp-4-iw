@@ -6,7 +6,7 @@ import {
   USER_CR_UD_SERVICE_NAME,
   UserCRUDServiceClient,
 } from '../stubs/user/v1alpha/user';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { Metadata } from '@grpc/grpc-js';
 import { firstValueFrom } from 'rxjs';
 
@@ -28,9 +28,16 @@ export class UserService implements OnModuleInit {
   ): Promise<User> {
     const meta = new Metadata();
     Object.entries(metadata).map(([k, v]) => meta.add(k, v));
-    const response: GetResponse = await firstValueFrom(
-      this.userService.get(request, meta) as any,
-    );
+
+    let response: GetResponse;
+
+    try {
+      response = await firstValueFrom(
+        this.userService.get(request, meta) as any,
+      );
+    } catch (error) {
+      throw new RpcException(error);
+    }
 
     return response.users?.[0];
   }
