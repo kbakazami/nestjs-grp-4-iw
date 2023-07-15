@@ -36,6 +36,7 @@ message ValidateResponse {
   bool ok = 1;
   int32 userId = 2;
   string userEmail = 3;
+  bool internal = 4;
 }
 
 message RefreshTokenRequest {

@@ -10,6 +10,7 @@ export interface Product {
   id: number;
   description: string;
   price: number;
+  userId: number;
 }
 
 export interface GetRequest {
@@ -25,6 +26,7 @@ export interface AddRequest {
   name: string;
   description: string;
   price: number;
+  userId: number;
 }
 
 export interface AddResponse {
@@ -36,6 +38,7 @@ export interface UpdateRequest {
   id: number;
   description: string;
   price: number;
+  userId: number;
 }
 
 export interface UpdateResponse {
@@ -43,6 +46,7 @@ export interface UpdateResponse {
 }
 
 export interface DeleteRequest {
+  userId: number;
   id: number;
 }
 

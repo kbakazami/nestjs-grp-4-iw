@@ -91,7 +91,7 @@ export class AppController {
     metadata?: Metadata,
   ): Promise<ValidateResponse> {
     try {
-      const user: User = this.jwtService.verify(request.jwt);
+      const { user, internal }: { user: User; internal: boolean } = this.jwtService.verify(request.jwt);
 
       if (!user) {
         console.log('cannot check jwt token');
@@ -101,6 +101,7 @@ export class AppController {
         ok: true,
         userId: user?.id,
         userEmail: user?.email,
+        internal: internal,
       };
     } catch (error) {
       console.log(error);
