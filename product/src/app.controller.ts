@@ -52,7 +52,23 @@ export class AppController implements ProductCRUDServiceController {
 
     delete request.id;
 
-    const product = await this.appService.update(id, request);
+    if (!request.userId) {
+      throw new RpcException('No user provided');
+    }
+
+    const userExist = await this.isUserExist(request.userId);
+
+    if (!userExist) {
+      throw new RpcException("User doesn't exist");
+    }
+
+    await this.isUserOwner(request.userId, id, 'update');
+
+    const product = await this.appService.update(id, {
+      name: request.name,
+      description: request.description,
+      price: request.price,
+    });
 
     return { product };
   }
@@ -61,6 +77,18 @@ export class AppController implements ProductCRUDServiceController {
     request: DeleteRequest,
     metadata?: Metadata,
   ): Promise<DeleteResponse> {
+    if (!request.userId) {
+      throw new RpcException('No user provided');
+    }
+
+    const userExist = await this.isUserExist(request.userId);
+
+    if (!userExist) {
+      throw new RpcException("User doesn't exist");
+    }
+
+    await this.isUserOwner(request.userId, request.id, 'delete');
+
     const product = await this.appService.delete(request.id);
 
     return { product };
@@ -72,9 +100,36 @@ export class AppController implements ProductCRUDServiceController {
       throw new RpcException('No user provided');
     }
 
+    const userExist = await this.isUserExist(request.userId);
+
+    if (!userExist) {
+      throw new RpcException("User doesn't exist");
+    }
+
+    const product = await this.appService.create(request as any);
+    return { product };
+  }
+
+  async isUserOwner(userId, productId, action) {
+    const product = await this.appService.findById(productId);
+
+    if (userId !== product.userId) {
+      if (action === 'update') {
+        throw new RpcException(
+          "You can't edit this product because you aren't the owner",
+        );
+      } else if (action === 'delete') {
+        throw new RpcException(
+          "You can't delete this product because you aren't the owner",
+        );
+      }
+    }
+  }
+
+  async isUserExist(userId) {
     const userExist = await this.userService.getUser(
       {
-        id: request.userId ?? undefined,
+        id: userId,
         firstname: undefined,
         lastname: undefined,
         email: undefined,
@@ -83,10 +138,9 @@ export class AppController implements ProductCRUDServiceController {
     );
 
     if (!userExist) {
-      throw new RpcException("User doesn't exist");
+      return false;
     }
 
-    const product = await this.appService.create(request as any);
-    return { product };
+    return true;
   }
 }
