@@ -7,6 +7,7 @@ import { PrismaService } from './prisma.service';
 import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import {envSchema} from "./env";
 @Module({
   imports: [
     UserModule,
@@ -19,6 +20,10 @@ import { JwtModule } from '@nestjs/jwt';
       global: true,
       secret: process.env.JWT_CONSTANT,
       signOptions: { expiresIn: '5m' },
+    }),
+    ConfigModule.forRoot({
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      validationSchema: envSchema,
     }),
   ],
   controllers: [AppController],
