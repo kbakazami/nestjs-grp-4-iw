@@ -38,6 +38,7 @@ export interface UpdateRequest {
   id: number;
   description: string;
   price: number;
+  userId: number;
 }
 
 export interface UpdateResponse {
@@ -45,6 +46,7 @@ export interface UpdateResponse {
 }
 
 export interface DeleteRequest {
+  userId: number;
   id: number;
 }
 
