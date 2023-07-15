@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import {
   GetRequest,
@@ -12,31 +12,38 @@ import {
   PRODUCT_CR_UD_SERVICE_NAME,
   AddRequest,
   AddResponse,
-  ProductCRUDServiceController
-} from "./stubs/product/v1alpha/product";
-import {Metadata} from "@grpc/grpc-js";
-import {GrpcMethod} from "@nestjs/microservices";
+  ProductCRUDServiceController,
+} from './stubs/product/v1alpha/product';
+import { Metadata } from '@grpc/grpc-js';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
+import { UserCRUDServiceClient } from './stubs/user/v1alpha/user';
+import { UserService } from './user/user.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller()
 @ProductCRUDServiceControllerMethods()
 export class AppController implements ProductCRUDServiceController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
   async get(request: GetRequest, metadata?: Metadata): Promise<GetResponse> {
     let product: Product;
     let products: Product[] = [];
 
-    if(request.id){
+    if (request.id) {
       product = await this.appService.findById(request.id);
-      return {products: [product]};
-    }else{
+      return { products: [product] };
+    } else {
       products = await this.appService.findAll();
-      return {products}
+      return { products };
     }
   }
-    async update(
-        request: UpdateRequest,
-        metadata?: Metadata
-    ): Promise<UpdateResponse> {
+  async update(
+    request: UpdateRequest,
+    metadata?: Metadata,
+  ): Promise<UpdateResponse> {
     const id = request.id;
 
     Object.keys(request).forEach(
@@ -48,23 +55,38 @@ export class AppController implements ProductCRUDServiceController {
     const product = await this.appService.update(id, request);
 
     return { product };
+  }
 
+  async delete(
+    request: DeleteRequest,
+    metadata?: Metadata,
+  ): Promise<DeleteResponse> {
+    const product = await this.appService.delete(request.id);
+
+    return { product };
+  }
+
+  @GrpcMethod(PRODUCT_CR_UD_SERVICE_NAME)
+  async add(request: AddRequest): Promise<AddResponse> {
+    if (!request.userId) {
+      throw new RpcException('No user provided');
     }
 
-    async delete(
-        request: DeleteRequest,
-        metadata?: Metadata
-    ): Promise<DeleteResponse> {
-        const product = await this.appService.delete(request.id);
+    const userExist = await this.userService.getUser(
+      {
+        id: request.userId ?? undefined,
+        firstname: undefined,
+        lastname: undefined,
+        email: undefined,
+      },
+      { Authorization: `Bearer ${this.jwtService.sign({ internal: true })}` },
+    );
 
-        return { product };
+    if (!userExist) {
+      throw new RpcException("User doesn't exist");
     }
 
-    @GrpcMethod(PRODUCT_CR_UD_SERVICE_NAME)
-    async add(request: AddRequest): Promise<AddResponse> {
-        const product = await this.appService.create(request as any);
-
-        return { product };
-    }
-
+    const product = await this.appService.create(request as any);
+    return { product };
+  }
 }
