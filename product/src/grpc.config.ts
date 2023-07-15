@@ -17,7 +17,7 @@ export const grpcConfig = (configService: ConfigService): GrpcOptions =>
   addReflectionToGrpcConfig({
     transport: Transport.GRPC,
     options: {
-      url: '0.0.0.0:3002',
+      url: `0.0.0.0:${configService.get<number>('PORT')}`,
       package: PRODUCT_V1ALPHA_PACKAGE_NAME,
       protoPath: join(__dirname, 'proto/product/v1alpha/product.proto'),
     },

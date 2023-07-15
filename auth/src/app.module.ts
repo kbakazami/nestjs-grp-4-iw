@@ -8,9 +8,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import grpcOption, { userGrpcConfig } from './grpc.config';
 import { GrpcReflectionModule } from 'nestjs-grpc-reflection';
 import { RefreshTokenModule } from './refresh-token/refresh-token.module';
+import { envSchema } from './env';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      validationSchema: envSchema,
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_CONSTANT,
