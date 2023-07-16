@@ -2,7 +2,7 @@
 import { Metadata } from "@grpc/grpc-js";
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
-import { User } from "../../user/v1alpha/user";
+import { User, UserRole } from "../../user/v1alpha/user";
 
 export const protobufPackage = "auth.v1alpha";
 
@@ -34,6 +34,7 @@ export interface ValidateResponse {
   userId: number;
   userEmail: string;
   internal: boolean;
+  userRole: UserRole;
 }
 
 export interface RefreshTokenRequest {

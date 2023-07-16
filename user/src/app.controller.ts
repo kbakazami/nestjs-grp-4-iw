@@ -16,6 +16,7 @@ import {
   USER_CR_UD_SERVICE_NAME,
   UserCRUDServiceController,
   UserCRUDServiceControllerMethods,
+  UserRole,
 } from './stubs/user/v1alpha/user';
 
 import { GrpcMethod } from '@nestjs/microservices';
@@ -23,6 +24,7 @@ import { Metadata } from '@grpc/grpc-js';
 import * as bcrypt from 'bcrypt';
 
 import { AuthGuard } from './auth/auth.guard';
+import { Roles } from './auth/role.decorator';
 
 @Controller()
 @UserCRUDServiceControllerMethods()
@@ -53,6 +55,7 @@ export class AppController implements UserCRUDServiceController {
   }
 
   @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
   async update(
     request: UpdateRequest,
     metadata?: Metadata,
@@ -71,6 +74,7 @@ export class AppController implements UserCRUDServiceController {
   }
 
   @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
   async delete(
     request: DeleteRequest,
     metadata?: Metadata,
@@ -108,6 +112,8 @@ export class AppController implements UserCRUDServiceController {
     }
   }
 
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
   async checkPassword(
     request: CheckPasswordRequest,
   ): Promise<CheckPasswordResponse> {

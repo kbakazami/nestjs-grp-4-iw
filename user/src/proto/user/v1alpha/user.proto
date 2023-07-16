@@ -2,11 +2,17 @@ syntax = "proto3";
 
 package user.v1alpha;
 
+enum UserRole {
+  USER = 0;
+  ADMIN = 1;
+}
+
 message User {
   int32 id = 1;
   string firstname = 2;
   string lastname = 3;
   string email = 4;
+  UserRole role = 5;
 }
 
 service UserCRUDService {
