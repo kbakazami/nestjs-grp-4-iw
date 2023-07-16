@@ -37,6 +37,7 @@ message ValidateResponse {
   int32 userId = 2;
   string userEmail = 3;
   bool internal = 4;
+  user.v1alpha.UserRole userRole = 5;
 }
 
 message RefreshTokenRequest {

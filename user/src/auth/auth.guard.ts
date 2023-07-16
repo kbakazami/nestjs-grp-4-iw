@@ -4,11 +4,18 @@ import { Reflector } from '@nestjs/core';
 import { ValidateResponse } from '../stubs/auth/v1alpha/auth';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
+import { UserRole } from '../stubs/user/v1alpha/user';
+import { ROLES_KEY } from './role.decorator';
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private reflector: Reflector) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
+      const roles = this.reflector.get<UserRole[]>(
+        ROLES_KEY,
+        context.getHandler(),
+      );
+
       const request = context.switchToRpc().getContext();
 
       const type = context.getType();
@@ -46,9 +53,17 @@ export class AuthGuard implements CanActivate {
         return true;
       }
 
+      if (roles && !roles.includes(response.userRole)) {
+        throw new RpcException({
+          code: status.PERMISSION_DENIED,
+          message: `authorized roles : ${roles}`,
+        });
+      }
+
       request.user = {
         id: response.userId,
         email: response.userEmail,
+        role: response.userRole,
       };
 
       return true;

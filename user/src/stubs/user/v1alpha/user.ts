@@ -5,11 +5,18 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "user.v1alpha";
 
+export enum UserRole {
+  USER = 0,
+  ADMIN = 1,
+  UNRECOGNIZED = -1,
+}
+
 export interface User {
   id: number;
   firstname: string;
   lastname: string;
   email: string;
+  role: UserRole;
 }
 
 export interface GetRequest {
