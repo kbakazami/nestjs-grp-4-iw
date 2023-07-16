@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import {envSchema} from "./env";
+import { HealthModule } from './health/health.module';
 @Module({
   imports: [
     UserModule,
@@ -25,6 +26,7 @@ import {envSchema} from "./env";
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: envSchema,
     }),
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
