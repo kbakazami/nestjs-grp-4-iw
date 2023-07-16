@@ -5,4 +5,5 @@ export const envSchema = Joi.object({
   AUTH_API_URL: Joi.string().required(),
   PRODUCT_API_URL: Joi.string().required(),
   PORT: Joi.number().default(3000),
+  HEALTH_PORT: Joi.number().default(4000),
 });
