@@ -9,6 +9,6 @@ async function bootstrap() {
   app.connectMicroservice(grpcConfig(configService));
   await app.startAllMicroservices();
 
-  await app.listen(6000);
+  await app.listen(configService.get('HEALTH_PORT'));
 }
 bootstrap();
