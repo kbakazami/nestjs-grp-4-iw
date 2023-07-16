@@ -9,6 +9,7 @@ import grpcOption, { userGrpcConfig } from './grpc.config';
 import { GrpcReflectionModule } from 'nestjs-grpc-reflection';
 import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import { envSchema } from './env';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { envSchema } from './env';
       useFactory: (configService: ConfigService) => grpcOption(configService),
     }),
     RefreshTokenModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
