@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mariadb:
+    extends:
+      file: ./compose/compose.db.yml
+      service: mariadb
+
+  tracing:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - 16686:16686
+      - 14268:14268
+
+networks:
+  default:
+    external: true
+    name: api-network_default
